@@ -75,7 +75,7 @@ adb reboot bootloader
 
 second, Unzip the recovery zip and run:
 ```shell
-./flash.bat // or flash.sh if your are on linux
+./flash.bat         #or flash.sh if your are on linux
 ```
 this script flashes the above mentioned images with fastboot command and then reboots your phone into the recovery
 
