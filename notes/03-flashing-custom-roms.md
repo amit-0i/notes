@@ -19,15 +19,15 @@
 ### 1. Unlock bootloader
 >[!CAUTION]
 > Unlocking bootloader is only possible on **OxygenOS 14** or above
-1. Turn on Developer option
+#### 1. Turn on Developer option
 
 Go to Settings > About phone > Version > Tap version 7-8 times
 
-2. Turn on USB debugging
+#### 2. Turn on USB debugging
 
 Go to Settings > Addition settings > Developer option > Enable usb debugging
 
-3. Authentication ADB
+#### 3. Authentication ADB
 
 Connect your phone to your pc then type
 ```shell
@@ -37,7 +37,7 @@ a pop-up will appear on the phone, click allow
 
 again type the above command and this type a serial device number will appear, this means the device is connected to the ADB interface successfully.
 
-4. Reboot to Bootloader
+#### 4. Reboot to Bootloader
 ```shell
 adb reboot bootloader
 ```
