@@ -80,5 +80,8 @@ second, Unzip the recovery zip and run:
 this script flashes the above mentioned images with fastboot command and then reboots your phone into the recovery
 
 ### 3. Format Data
+>[!IMPORTANT]
+> You must do a Factory reset if you are coming from OxygenOS
+
 while in recovery, press `Factory reset` > then `Format data/Factory reset`
 
