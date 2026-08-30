@@ -85,3 +85,11 @@ this script flashes the above mentioned images with fastboot command and then re
 
 while in recovery, press `Factory reset` > then `Format data/Factory reset`
 
+### 4. Sideload ROM zip
+while in recovey, press `Apply update` > then `Apply from ADB`
+
+Now run:
+```shell
+adb sideload "/path/to/ROM.zip"
+```
+type the exact path or you can also drag and drop ROM zip.
