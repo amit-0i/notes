@@ -43,7 +43,6 @@
 # OnePlus Nord CE 3 — Specifications
 
 ## Network
-
 | Category | Specifications |
 |---|---|
 | 2G bands | GSM 850 / 900 / 1800 / 1900 |
@@ -51,26 +50,20 @@
 | 4G bands | 1, 2, 3, 4, 5, 7, 8, 28, 34, 38, 39, 40, 41 |
 | 5G bands | 1, 3, 5, 8, 28, 40, 41, 78 (SA/NSA) |
 | Speed | HSPA / LTE / 5G |
-
 ## Launch
-
 | Item | Details |
 |---|---|
 | Announced | July 5, 2023 |
 | Released | August 5, 2023 |
 | Status | Available |
-
 ## Body
-
 | Item | Details |
 |---|---|
 | Dimensions | 162.7 × 75.5 × 8.2 mm |
 | Weight | 184 g |
 | Build | Glass front, plastic frame, plastic back |
 | SIM | Nano-SIM + Nano-SIM |
-
 ## Display
-
 | Item | Details |
 |---|---|
 | Type | Fluid AMOLED, 1B colors, 120 Hz, HDR10+ |
@@ -79,28 +72,21 @@
 | Resolution | 1080 × 2412 pixels |
 | Aspect ratio | 20:9 |
 | Pixel density | ~394 ppi |
-
 ## Platform
-
 | Item | Details |
 |---|---|
 | OS | Android 13 / OxygenOS 13.1 |
 | Chipset | Qualcomm Snapdragon 782G (6 nm) |
 | CPU | 1×2.7 GHz Cortex-A78 + 3×2.4 GHz Cortex-A78 + 4×1.8 GHz Cortex-A55 |
 | GPU | Adreno 642L |
-
 ## Memory & Storage
-
 | Item | Details |
 |---|---|
 | Card slot | microSDXC (shared SIM slot) |
 | Internal storage | 128 GB + 8 GB RAM; 256 GB + 12 GB RAM |
 | Storage type | UFS 3.1 |
-
 ## Cameras
-
 ### Main Camera
-
 | Item | Details |
 |---|---|
 | Setup | Triple camera |
@@ -109,26 +95,20 @@
 | Macro | 2 MP |
 | Features | LED flash, HDR, panorama |
 | Video | 4K@30fps; 1080p@30/60/120fps; gyro-EIS |
-
 ### Selfie Camera
-
 | Item | Details |
 |---|---|
 | Setup | Single camera |
 | Camera | 16 MP, f/2.4, 24 mm wide, 1.0 µm |
 | Features | HDR |
 | Video | 1080p@30fps, gyro-EIS |
-
 ## Sound
-
 | Item | Details |
 |---|---|
 | Loudspeaker | Stereo speakers |
 | 3.5 mm headphone jack | No |
 | Hi-Res audio | 24-bit / 192 kHz |
-
 ## Connectivity
-
 | Item | Details |
 |---|---|
 | WLAN | Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct |
@@ -138,34 +118,26 @@
 | Infrared port | Yes |
 | FM radio | No |
 | USB | USB Type-C 2.0 |
-
 ## Sensors
-
 - Fingerprint sensor (under-display, optical)
 - Accelerometer
 - Gyroscope
 - Proximity sensor
 - Compass
 - Temperature sensor
-
 ## Battery
-
 | Item | Details |
 |---|---|
 | Type | Li-Po |
 | Capacity | 5000 mAh |
 | Charging | 80 W wired |
 | Charging claim | 61% in 15 minutes |
-
 ## Miscellaneous
-
 | Item | Details |
 |---|---|
 | Colors | Aqua Surge, Gray Shimmer |
 | Model | CPH2569 |
 | SAR | 1.17 W/kg (head), 0.91 W/kg (body) |
-
-
 Official device specs:  
 https://www.oneplus.in/nord-ce-3-5g/specs
 
