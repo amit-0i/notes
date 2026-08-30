@@ -1,128 +1,340 @@
-# OnePlus Nord CE3 5G (ziti) Documentation
+# OnePlus Nord CE 3 (Ziti) — Android Modding Notes
 
-Community-maintained documentation for the **OnePlus Nord CE 3 5G (CPH2569)**, internally known as **ziti**.
-
-This documentation covers bootloader unlocking, ADB/Fastboot setup, stock ROM backups, rooting, custom ROM installation, reverting to OxygenOS, etc
-
-> [!WARNING]
+> Community-maintained notes for the **OnePlus Nord CE 3 (Ziti)**.
 >
-> Flashing firmware, unlocking the bootloader, rooting, modifying partitions, or relocking the bootloader can permanently damage or brick your device.
+> **Device:** OnePlus Nord CE 3 5G  
+> **Codename:** `ziti`  
+> **Model:** `CPH2569`  
+> **Region:** India-only variant in the source notes  
+> **China counterpart:** OPPO K11
+
+> [!CAUTION]
+> Bootloader unlocking/locking, downgrading, rooting, flashing custom ROMs, and reverting to stock can erase data or brick the device.
+> **You are responsible for what you do to your device. Back up important data before modifying anything.**
 >
-> You are responsible for anything you do to your device. This documentation is community-maintained and is provided without warranty.
+> The source notes specifically warn **not to downgrade to OxygenOS 13 with an unlocked bootloader**.
 
 ---
 
-## Important: Read This Before Flashing Anything
+## Table of Contents
 
-### OxygenOS 15.0.0.1301 and newer
-
-**Treat OOS 15.0.0.1301+ devices differently from older firmware.**
-
-For users on **OOS 15.0.0.1301 or newer**:
-
-* Do **not** downgrade to an older firmware unless a current device-specific guide explicitly confirms it is safe.
-* Do **not** flash custom ROM packages containing older firmware over your current firmware.
-* Prefer custom ROM builds explicitly shipped **without firmware** when required by the ROM maintainer.
-* Make sure both A/B slots contain the expected firmware before flashing.
-* Do **not** perform an OxygenOS update with an unlocked bootloader unless a current ziti-specific guide explicitly says that the update is safe.
-* When reverting to OxygenOS, use the same firmware version you were running before installing the custom ROM whenever the current guide requires it.
-
-Multiple active ziti ROM projects continue to publish these warnings for OOS 15.0.0.1301+ users.
-
-### OxygenOS 13.1 warning
-
-The bootloader is broken on OxygenOS 13.1 which was later fixed by OnePlus with OxygenOS 14.
-
-**Do not downgrade to OOS 13.1 while the bootloader is unlocked.**
-
-Do not follow an old downgrade guide blindly. Verify the exact firmware/build and current recovery procedure before proceeding.
+- [Device Information](#device-information)
+- [Required Tools and Drivers](#required-tools-and-drivers)
+- [Critical Warnings](#critical-warnings)
+- [Bootloader Unlock / Lock](#bootloader-unlock--lock)
+- [Downgrade OxygenOS](#downgrade-oxygenos)
+- [Payload Dumper Go](#payload-dumper-go)
+- [Root on Stock OxygenOS](#root-on-stock-oxygenos)
+- [Root on Custom ROMs](#root-on-custom-roms)
+- [Before Installing a Custom ROM](#before-installing-a-custom-rom)
+- [Flashing Custom ROMs via ADB Sideload](#flashing-custom-roms-via-adb-sideload)
+- [Flashing Fastboot ROMs](#flashing-fastboot-roms)
+- [Flashing Custom ROMs on OOS 15.0.0.1301+](#flashing-custom-roms-on-oos-15001301)
+- [Flashing the Same Firmware to the Other Slot](#flashing-the-same-firmware-to-the-other-slot)
+- [Reverting to Stock OxygenOS](#reverting-to-stock-oxygenos)
+- [Stock Firmware List](#stock-firmware-list)
+- [Emergency Recovery: "System Destroyed"](#emergency-recovery-system-destroyed)
+- [Reference Links](#reference-links)
 
 ---
 
-# Quick Start
+## Device Information
 
-New to modding your ziti?
+| Item | Details |
+|---|---|
+| Display | 6.7" Fluid AMOLED, 120 Hz, HDR10+, 1B colors |
+| Resolution | 1080 × 2412, 20:9, ~394 ppi |
+| PWM | 2160 Hz |
+| Weight | 184 g |
+| Rear cameras | 50 MP IMX890 OIS/EIS + 8 MP IMX355 + 2 MP |
+| Front camera | 16 MP IMX481 |
+| Original OS | Android 13 / OxygenOS 13.1 |
+| Support noted in source | 2 + 3 years |
+| SoC | Qualcomm Snapdragon 782G (6 nm) |
+| CPU | 1×2.7 GHz Cortex-A78 + 3×2.4 GHz Cortex-A78 + 4×1.8 GHz Cortex-A55 |
+| GPU | Adreno 642L |
+| Battery | 5000 mAh dual-cell, non-removable |
+| Charging | 80 W SUPERVOOC |
+| Storage | UFS 3.1 |
+| Wireless | Wi-Fi 6, Bluetooth 5.2 |
+| Other features | microSD, NFC, IR blaster, Dolby Atmos, Hi-Res audio, X-axis linear motor, in-display fingerprint |
 
-Read the documentation in this order:
-
-1. [Start Here](docs/00-start-here.md)
-2. [Drivers and Tools](docs/01-drivers-and-tools.md)
-3. [Bootloader Unlock / Lock](docs/02-bootloader.md)
-4. [Back Up Stock Images](docs/03-backup-stock.md)
-5. [Root Stock OxygenOS](docs/05-root-stock.md)
-6. [Flash a Custom ROM](docs/07-custom-rom.md)
-7. [Revert to Stock OxygenOS](docs/08-reverting-to-stock.md)
-
-If something goes wrong, see [Unbrick](docs/09-unbrick.md) and [Troubleshooting](docs/11-troubleshooting.md).
+Official device specs:  
+https://www.oneplus.in/nord-ce-3-5g/specs
 
 ---
 
-# Guides
+## Required Tools and Drivers
 
-## Drivers and Tools
+### ADB / Fastboot drivers
 
-Required PC tools:
+- Universal ADB Drivers: https://adb.clockworkmod.com/
+- Google USB Drivers: https://developer.android.com/studio/run/win-usb
+- Latest ADB/Fastboot installer (GitHub): https://github.com/fawazahmed0/Latest-adb-fastboot-installer-for-windows
+- Android SDK Platform-Tools: https://developer.android.com/tools/releases/platform-tools
 
-* Android SDK Platform-Tools
-* USB drivers
-* ADB
-* Fastboot
-* Payload Dumper Go
-* Magisk when rooting
+> [!IMPORTANT]
+> The source notes repeatedly recommend using the **latest Platform-Tools** and current GApps when flashing.
 
-Use the **latest Android SDK Platform-Tools** from Google whenever possible. The official Android page currently lists Platform-Tools 37.0.1 and provides always-current downloads.
+---
 
-See:
+## Critical Warnings
 
-**[Drivers and Tools →](docs/01-drivers-and-tools.md)**
+### Downgrading
+
+- **Do not downgrade to OxygenOS 13 with an unlocked bootloader.**
+- Downgrading can erase internal storage.
+- The source notes state that OxygenOS 13.1 on this device has bootloader-related problems and later notes say downgrading is effectively unavailable for OOS 15.0.0.1301+ users.
+
+### Bootloader locking
+
+- **Unroot before relocking.**
+- Do not relock while a patched/rooted boot image is active.
+- The recovery procedure in these notes assumes you restore the correct stock boot image first.
+
+### OOS 15.0.0.1301+ / newer firmware
+
+For devices on `CPH2569_15.0.0.1301` or newer:
+
+1. Use custom ROMs **without bundled firmware** for builds after 26 November 2025.
+2. Before flashing a custom ROM, put the **same currently installed firmware** on the other slot.
+3. If returning to OxygenOS, return to the same firmware version to avoid issues with later OnePlus updates.
+
+The source warns that missing these precautions can cause a **hard brick**, potentially requiring service-center recovery.
 
 ---
 
 ## Bootloader Unlock / Lock
 
-Unlocking the bootloader will erase the device.
+### Prerequisites
 
-Before unlocking:
+- Back up everything. Unlocking or locking erases internal storage.
+- Install current ADB/Fastboot drivers.
+- Use a compatible OOS version where bootloader unlocking is available.
+- Enable Developer Options:
+  - Settings → About phone → Version
+  - Tap the version number 7–8 times.
+- In Developer Options, enable:
+  - **USB debugging**
+  - **Allow bootloader unlock**
 
-* Back up internal storage.
-* Enable Developer Options.
-* Enable USB Debugging.
-* Enable the OEM/bootloader unlocking option when available.
-* Install ADB/Fastboot drivers.
-* Verify ADB communication with the phone.
-
-Basic commands:
+### Verify ADB connection
 
 ```bash
 adb devices
-adb reboot bootloader
-fastboot devices
-fastboot flashing unlock
-fastboot reboot
 ```
 
-To lock:
+Accept the authorization prompt on the phone, then run:
+
+```bash
+adb devices
+```
+
+A serial number indicates that the device is connected to ADB.
+
+### Enter Fastboot / Bootloader
 
 ```bash
 adb reboot bootloader
+```
+
+Or use the hardware keys:
+
+```text
+Volume Up + Volume Down + Power
+```
+
+Verify Fastboot:
+
+```bash
+fastboot devices
+```
+
+### Useful slot commands
+
+Check active slot:
+
+```bash
+fastboot getvar current-slot
+```
+
+Switch active slot:
+
+```bash
+fastboot --set-active=a
+```
+
+Replace `a` with `b` to select slot B.
+
+### Unlock
+
+```bash
+fastboot flashing unlock
+```
+
+Confirm **Unlock** on the phone using the volume and power buttons.
+
+### Lock
+
+Only after restoring the correct stock state and removing root:
+
+```bash
 fastboot flashing lock
 ```
 
-**Do not relock a modified/rooted device.**
+Confirm **Lock** on the phone.
 
-Before locking, restore the correct stock boot image and completely return the device to an appropriate stock state.
+### Reboot
 
-See:
-
-**[Bootloader Unlock / Lock →](docs/02-bootloader.md)**
+```bash
+fastboot reboot
+```
 
 ---
 
-# Back Up Stock Firmware
+## Downgrade OxygenOS
 
-Before experimenting with custom ROMs, maintain a backup of important stock partitions.
+> [!CAUTION]
+> **Do not perform this with an unlocked bootloader.**
+>
+> The process wipes user data. Make a complete backup first.
 
-On a rooted stock system, the community backup procedure traditionally used:
+1. Enable Developer Options.
+2. Open:
+   - Settings → About phone → OxygenOS
+3. Open the three-dot menu.
+4. Select **Local install**.
+5. Select the downgrade package.
+6. Tap **Install**.
+7. The phone reboots and the source notes state that all internal data will be erased.
+
+---
+
+## Payload Dumper Go
+
+Use this to extract partition images from a payload/ROM package.
+
+### Procedure
+
+1. Download the stock or custom ROM ZIP.
+2. Download Payload Dumper Go.
+3. Put the ROM ZIP and Payload Dumper Go in the same folder.
+4. Open a terminal in that folder.
+5. Run:
+
+```bash
+payload-dumper-go romname.zip
+```
+
+You can also drag the ZIP into the terminal.
+
+The extracted images will appear in a separate output folder.
+
+---
+
+## Root on Stock OxygenOS
+
+### Requirements
+
+- Stock `boot.img` matching the **exact build currently installed**.
+- Magisk app.
+- ADB / Platform-Tools.
+- Unlocked bootloader.
+
+### Patch the boot image
+
+1. Extract the matching stock ROM.
+2. Obtain its `boot.img`.
+3. Copy `boot.img` to the phone.
+4. Keep another copy in the Platform-Tools folder for recovery/unrooting.
+5. Open Magisk.
+6. Select:
+   - Install → Select and Patch a File
+7. Choose the copied `boot.img`.
+8. Magisk places the patched image in the Download directory.
+9. Rename it to:
+
+```text
+magisk_patched.img
+```
+
+### Flash the patched image
+
+Copy the patched image to the Platform-Tools directory, then:
+
+```bash
+adb reboot bootloader
+fastboot flash boot magisk_patched.img
+fastboot reboot
+```
+
+After reboot, open Magisk and verify root.
+
+---
+
+## Root on Custom ROMs
+
+The source notes give two methods.
+
+### Method A — Magisk via recovery sideload
+
+1. Connect to the PC and verify ADB:
+
+```bash
+adb devices
+```
+
+2. Reboot to recovery:
+
+```bash
+adb reboot recovery
+```
+
+3. In recovery:
+   - Apply Update
+   - ADB Sideload
+4. On the PC:
+
+```bash
+adb sideload magisk.apk
+```
+
+5. Reboot to system and open Magisk.
+
+### Method B — Patch the custom ROM boot image
+
+1. Extract the ROM with Payload Dumper.
+2. Copy the ROM's `boot.img` to the phone.
+3. In Magisk:
+   - Install → Select and Patch a File
+4. Patch `boot.img`.
+5. Rename the resulting file to:
+
+```text
+magisk_los_patched.img
+```
+
+6. Copy it to Platform-Tools.
+7. Flash:
+
+```bash
+adb reboot bootloader
+fastboot flash boot magisk_los_patched.img
+fastboot reboot
+```
+
+8. Open Magisk after reboot to verify root.
+
+---
+
+## Before Installing a Custom ROM
+
+> [!IMPORTANT]
+> The source strongly recommends backing up stock partition images before modifying the device.
+
+### Back up `super.img` and `persist.img`
+
+With root access:
 
 ```bash
 adb shell
@@ -131,230 +343,27 @@ dd if=/dev/block/by-name/super of=/sdcard/super.img
 dd if=/dev/block/by-name/persist of=/sdcard/persist.img
 ```
 
-The resulting files are normally:
+The source notes:
 
-```text
-super.img
-persist.img
-```
-
-### Important
-
-`persist.img` contains device-specific data.
-
-Do **not** distribute your personal `persist.img`.
-
-Keep your own backup somewhere safe.
-
-It may contain device-specific calibration, fingerprint-related, sensor-related, or other unique data required by your particular handset.
-
-See:
-
-**[Back Up Stock Images →](docs/03-backup-stock.md)**
+- `super.img` may be around 14–15 GB.
+- `persist.img` may be around 30–40 MB.
+- `persist.img` contains device-specific data such as fingerprint-related data.
+- Keep `persist.img` safe; losing it may result in fingerprint or VoLTE problems.
+- Keep backups of newer `super.img` files after major stock updates.
 
 ---
 
-# Downgrading OxygenOS
+## Flashing Custom ROMs via ADB Sideload
 
-Downgrading is **firmware-specific and build-specific**.
+Use this flow for ROMs that are distributed as recovery/ADB-sideload packages.
 
-Older guides for Ziti used OxygenOS local installation packages. However, the downgrade rules changed significantly with later OxygenOS versions.
+### Files required
 
-Do **not** treat an old downgrade package as universally safe.
-
-### Older local-install method
-
-When supported by the firmware:
-
-1. Enable Developer Options.
-2. Open:
-
-```text
-Settings
-→ About Device
-→ Version
-```
-
-3. Use the menu in the OxygenOS updater/local installation interface.
-4. Select the correct rollback/downgrade package.
-5. Start the installation.
-
-A downgrade normally performs a factory reset.
-
-**Back up everything first.**
-
-### OOS 15.0.0.1301+
-
-Do not use an old OOS downgrade guide on these builds without verifying that the procedure is currently supported.
-
-Active Ziti community ROM documentation continues to warn users not to downgrade to older firmware from the 1301+ branch.
-
-See:
-
-**[Downgrade Guide →](docs/04-downgrade.md)**
-
----
-
-# Rooting Stock OxygenOS
-
-The basic Magisk workflow is:
-
-1. Obtain the **exact stock `boot.img` matching your currently installed build**.
-2. Install Magisk.
-3. Patch the stock boot image with Magisk.
-4. Copy the patched image back to the PC.
-5. Reboot to bootloader.
-6. Flash the patched boot image.
-7. Reboot and verify root.
-
-Typical commands:
-
-```bash
-adb reboot bootloader
-fastboot flash boot magisk_patched.img
-fastboot reboot
-```
-
-Example file naming:
-
-```text
-boot.img
-magisk_patched.img
-```
-
-### Critical rule
-
-Never assume that a boot image from another OxygenOS build is compatible with your current firmware.
-
-Always match:
-
-```text
-Installed build
-        ↓
-Matching stock boot.img
-        ↓
-Magisk-patched boot.img
-```
-
-Current Magisk releases should be obtained from the official Magisk project rather than relying on an old version embedded in an old tutorial.
-
-See:
-
-**[Root Stock OxygenOS →](docs/05-root-stock.md)**
-
----
-
-# Rooting Custom ROMs
-
-There are two common approaches.
-
-## Method A — Recovery / ADB Sideload
-
-When supported by the ROM recovery:
-
-```bash
-adb reboot recovery
-adb sideload Magisk.apk
-```
-
-The exact method depends on the recovery and Android version.
-
-## Method B — Patch the ROM Boot Image
-
-1. Extract the ROM payload.
-2. Locate `boot.img`.
-3. Copy it to the device.
-4. Patch it using Magisk.
-5. Copy the patched image to the PC.
-6. Reboot to bootloader.
-7. Flash the patched boot image.
-
-Example:
-
-```bash
-adb reboot bootloader
-fastboot flash boot magisk_los_patched.img
-fastboot reboot
-```
-
-Always use the boot image belonging to the exact ROM build you are installing.
-
-See:
-
-**[Root Custom ROM →](docs/06-root-custom-rom.md)**
-
----
-
-# Payload Dumper Go
-
-Some ROM/OTA packages contain Android payload images inside a payload archive.
-
-Payload Dumper Go can be used to extract them.
-
-Example layout:
-
-```text
-payload-dumper/
-├── payload-dumper-go
-└── rom.zip
-```
-
-Run:
-
-```bash
-payload-dumper-go rom.zip
-```
-
-The extracted images can include files such as:
-
-```text
-boot.img
-vendor_boot.img
-dtbo.img
-vbmeta.img
-```
-
-Always verify which images your ROM maintainer actually instructs you to flash.
-
-Do not flash every extracted image simply because it exists.
-
-See:
-
-**[Drivers and Tools → Payload Dumper](docs/01-drivers-and-tools.md)**
-
----
-
-# Flashing Custom ROMs
-
-Custom ROM installation depends on the ROM.
-
-A ROM may use:
-
-* ADB sideload
-* Fastboot
-* FastbootD
-* A ROM-specific recovery
-* A combination of these
-
-**Always follow the ROM maintainer's current flashing instructions first.**
-
-## Typical ADB/Sideload workflow
-
-### 1. Unlock the bootloader
-
-See:
-
-[Bootloader Unlock / Lock](docs/02-bootloader.md)
-
-### 2. Reboot to bootloader
-
-```bash
-adb reboot bootloader
-```
-
-### 3. Flash the recovery supplied by the ROM maintainer
-
-A typical recovery package may contain:
+- Custom ROM ZIP
+- Latest ADB / Platform-Tools
+- ADB/Fastboot drivers
+- Unlocked bootloader
+- Recovery ZIP containing:
 
 ```text
 boot.img
@@ -362,444 +371,455 @@ dtbo.img
 vendor_boot.img
 vbmeta.img
 super_empty.img
-flash.bat
-flash.sh
 ```
 
-Do not assume these files are interchangeable between ROMs.
-
-### 4. Enter recovery
-
-If required:
+The source recovery package uses commands equivalent to:
 
 ```bash
+fastboot wipe-super super_empty.img
+fastboot flash boot boot.img
+fastboot flash vendor_boot vendor_boot.img
+fastboot flash dtbo dtbo.img
+fastboot flash vbmeta vbmeta.img
 fastboot reboot recovery
 ```
 
-### 5. Format data
+### Flashing procedure
 
-For a clean installation:
+1. Extract the recovery ZIP into the Platform-Tools directory.
+2. Reboot to bootloader:
 
-```text
-Factory Reset
-→ Format Data / Factory Reset
+```bash
+adb reboot bootloader
 ```
 
-Formatting data is commonly required when moving from OxygenOS to a custom ROM.
+3. Run the supplied `flash.bat` / `flash.sh`.
+4. Boot into recovery.
+5. **Format / Reset Data**. The source marks this as mandatory for the initial flash.
+6. Go to:
+   - Apply Updates → ADB Sideload
+7. Sideload the ROM:
 
-### 6. Sideload the ROM
+```bash
+adb sideload rom.zip
+```
+
+8. When prompted about additional packages:
+   - Select **Yes** when you need an additional package such as GApps.
+   - Select **No** for builds that already include GMS/GApps.
+9. Reboot to system.
+
+### `kinstalldeviceopenerror`
+
+If Lineage recovery reports:
+
+```text
+kinstalldeviceopenerror
+```
+
+The source recommends:
+
+1. Format Data in recovery.
+2. Reboot to recovery again.
+3. Retry the ROM sideload.
+
+> [!NOTE]
+> Format Data is also noted as necessary when doing the first ROM flash, switching between ROMs, or when the ROM maintainer explicitly requires it.
+
+---
+
+## Flashing Fastboot ROMs
+
+Use this method only when the ROM maintainer specifically says the ROM is intended for Fastboot flashing.
+
+### Procedure
+
+1. Download the ROM ZIP.
+2. Put the device in bootloader mode:
+
+```bash
+adb reboot bootloader
+```
+
+Or use:
+
+```text
+Power + Volume Up + Volume Down
+```
+
+3. Place the ROM ZIP in the Platform-Tools folder.
+4. Run:
+
+```bash
+fastboot update romname.zip
+```
+
+5. Format data on first boot, if required:
+
+```bash
+fastboot -w
+```
+
+The source notes say the ADB method should be preferred for LineageOS and similar ROMs unless the ROM post explicitly calls for Fastboot flashing.
+
+---
+
+## Flashing Custom ROMs on OOS 15.0.0.1301+
+
+This section consolidates the newer firmware-specific instructions from the source.
+
+> [!CAUTION]
+> For `CPH2569_15.0.0.1301` and newer:
+>
+> - Flash only custom ROMs **without firmware** for builds after 26 November 2025.
+> - Put the currently installed firmware on the other slot before flashing the ROM.
+> - Do not update OxygenOS while the bootloader is unlocked.
+> - Do not downgrade to older firmware.
+
+### Flash flow
+
+1. Confirm the bootloader is unlocked.
+2. Reboot to bootloader:
+
+```bash
+adb reboot bootloader
+```
+
+3. Flash the recovery supplied by the ROM maintainer.
+4. Run its `flash.bat` / equivalent script.
+5. In recovery:
+   - Factory reset
+   - Format Data
+6. Sideload the ROM:
+
+```bash
+adb sideload rom.zip
+```
+
+7. During the sideload:
+   - The progress may stop around **47%** temporarily.
+   - Choose **Yes** for additional packages when needed.
+   - Choose **No** for builds that already contain the necessary Google components.
+8. Reboot.
+
+---
+
+## Flashing the Same Firmware to the Other Slot
+
+This is required by the newer OOS 15 instructions before flashing certain custom ROMs.
+
+### Procedure
+
+1. Check your current OxygenOS version:
+   - Settings → About phone → Version
+2. Download the **same** version OTA.
+3. Enable Developer Options.
+4. Install the OTA using Local Install:
+   - Settings → About phone → Update
+   - Three-dot menu → Local install
+5. Select the downloaded OTA.
+6. Reboot after installation.
+
+### Alternative recovery-based method
+
+The source also describes:
+
+1. Flash compatible recovery from bootloader.
+2. Format Data in recovery.
+3. Sideload the same firmware OTA:
+
+```bash
+adb sideload 1601.zip
+```
+
+4. If verification fails, choose **Yes** to install anyway.
+5. When the package reaches about 47% and asks to reboot recovery for additional files, choose **No**.
+6. Reboot to bootloader from recovery.
+7. Run the stock/reversion script.
+8. The other slot should contain the same OOS build.
+
+After that, proceed with the custom ROM flash.
+
+---
+
+## Reverting to Stock OxygenOS
+
+There are several versions of the source procedure. The common flow is:
+
+### Files required
+
+- A recovery that supports reverting to stock.
+- Matching stock OTA ZIP.
+- Stock/reversion script package (called `my_shit.zip` in the source notes).
+- Latest Platform-Tools.
+
+The source notes state that **not all recoveries support reverting**.
+
+### Step 1 — Enter bootloader
+
+```bash
+adb reboot bootloader
+fastboot devices
+```
+
+### Step 2 — Flash the compatible recovery
+
+Extract the recovery ZIP into Platform-Tools and run its supplied script:
+
+```text
+flash.bat
+```
+
+or the corresponding Linux/macOS script.
+
+The device should boot into recovery.
+
+### Step 3 — Format Data
 
 In recovery:
 
 ```text
-Apply Update
-→ ADB Sideload
+Factory reset → Format Data
+```
+
+### Step 4 — Sideload stock OTA
+
+Go to:
+
+```text
+Apply Update → ADB Sideload
 ```
 
 Then:
 
 ```bash
-adb sideload rom.zip
+adb sideload stock_rom.zip
 ```
 
-### 7. Optional additional packages
+The source notes say to choose **Yes** for prompts such as:
 
-Depending on the build:
+- Signature verification failed
+- This is a downgrade package
+- This will downgrade your system
 
-* GMS build → usually do not flash another GApps package unless instructed.
-* Vanilla build → flash a compatible GApps package if required.
+For the additional-package/reboot-recovery prompt, choose **No** according to the source procedure.
 
-Do not mix incompatible GApps packages or Android versions.
+### Step 5 — Return to bootloader
 
-### 8. Reboot
+From recovery:
 
 ```text
-Reboot System
+Advanced → Reboot to Bootloader
 ```
 
-See:
+### Step 6 — Run the stock/reversion script
 
-**[Custom ROM Installation →](docs/07-custom-rom.md)**
+Extract the supplied stock script package into Platform-Tools and run its script.
 
----
-
-# Firmware Rules for OOS 15.0.0.1301+
-
-This section is intentionally prominent.
-
-For users on **OOS 15.0.0.1301+**, current community ROM documentation advises maintaining the appropriate modern firmware and using ROM packages that do not replace it with an older firmware stack.
-
-The important concepts are:
-
-```text
-ROM
-Firmware
-Slot A
-Slot B
-```
-
-A/B devices can have different software states on their two slots.
-
-Before flashing anything, determine:
+The source describes the process as automating commands such as:
 
 ```bash
-fastboot getvar current-slot
+fastboot reboot fastboot
+sleep 5
+fastboot create-logical-partition my_company_a 0
+fastboot create-logical-partition my_company_b 0
+fastboot create-logical-partition my_preload_a 0
+fastboot create-logical-partition my_preload_b 0
+fastboot flash my_company --slot=all my_company.img
+fastboot flash my_preload --slot=all my_preload.img
+sleep 5
+fastboot reboot bootloader
+fastboot -w
+fastboot reboot
 ```
 
-The active slot is normally reported as either:
-
-```text
-a
-```
-
-or
-
-```text
-b
-```
-
-Changing slots should only be done when a device-specific procedure explicitly tells you to.
-
-See:
-
-**[Slots and Firmware →](docs/10-slots-and-firmware.md)**
+The expected result is a boot into stock OxygenOS.
 
 ---
 
-# Reverting to Stock OxygenOS
+## Emergency Recovery: "System Destroyed"
 
-Reverting from a custom ROM is not simply:
+The source describes this scenario as commonly occurring when relocking after removing Magisk without first restoring the stock boot image.
 
-```text
-flash OTA → reboot
-```
+### Recovery procedure
 
-On Ziti, the recovery and firmware state must be considered together.
-
-Typical workflow:
-
-1. Obtain the correct stock OTA package.
-2. Obtain a compatible reverting/recovery package.
-3. Reboot to bootloader.
-4. Flash the required recovery.
-5. Enter recovery.
-6. Format data.
-7. Sideload the stock OTA.
-8. Reboot to bootloader.
-9. Run the appropriate stock/reverting script.
-10. Allow the script to finish.
-11. Boot OxygenOS.
-
-Example:
-
-```bash
-adb reboot bootloader
-```
-
-Then use the exact recovery and flashing script supplied for your target stock build.
-
-### Match your firmware
-
-For newer OOS 15 branches, current Ziti community documentation recommends reverting using the appropriate same-version/current firmware rather than arbitrarily choosing an older OxygenOS package.
-
-See:
-
-**[Reverting to Stock →](docs/08-reverting-to-stock.md)**
-
----
-
-# Common Failure: "System Destroyed"
-
-A common community-reported mistake is attempting to relock the bootloader after rooting/modifying the device without restoring the correct stock images.
-
-Typical scenario:
-
-```text
-Rooted stock OOS
-        ↓
-Uninstall Magisk
-        ↓
-Attempt bootloader lock
-        ↓
-Boot failure / "System destroyed"
-```
-
-### General recovery concept
-
-If the device can still enter Fastboot:
+If the device is locked, unlock it again:
 
 ```bash
 fastboot flashing unlock
 ```
+
+If it is boot-looping but not entering Fastboot automatically:
+
+1. Unplug it from the PC.
+2. Force Fastboot using:
+
+```text
+Volume Up + Volume Down + Power
+```
+
+3. Connect it to the PC after Fastboot appears.
 
 Then flash the **matching stock boot image**:
 
 ```bash
+fastboot flashing unlock
 fastboot flash boot boot.img
-```
-
-A data wipe may be required:
-
-```bash
-fastboot -w
-```
-
-Then:
-
-```bash
 fastboot reboot
 ```
 
-Only attempt relocking after the device has successfully returned to a completely appropriate stock state.
+The source notes that:
 
-Do not flash a Magisk-patched image when your goal is to restore a clean stock boot state.
+- The `boot.img` must match the OxygenOS version installed on the device.
+- To unroot, use the **stock** boot image, not a patched Magisk image.
+- `fastboot -w` can format the device if necessary, but the notes say it is not always required.
 
-See:
+After the device successfully boots into the system, you may attempt to relock:
 
-**[Unbrick →](docs/09-unbrick.md)**
+```bash
+adb reboot bootloader
+fastboot flashing lock
+```
 
 ---
 
-# Fastboot Commands Reference
+## Stock Firmware List
 
-### Check connected device
+The source groups the following builds as follows.
 
-```bash
-fastboot devices
+### Non-ARB
+
+```text
+CPH2569_14.0.0.1101(EX01)
+CPH2569_14.0.0.1401(EX01)
+CPH2569_14.0.0.1402(EX01)
+CPH2569_15.0.0.402(EX01)
+CPH2569_15.0.0.700(EX01)
+CPH2569_15.0.0.901(EX01)
 ```
 
-### Show current slot
+### Questionable update
+
+```text
+CPH2569_15.0.0.1201(EX01)
+```
+
+### ARB
+
+```text
+CPH2569_15.0.0.1301(EX01)
+CPH2569_15.0.0.1601(EX01)
+CPH2569_15.0.0.1602(EX01)
+CPH2569_15.0.0.1604(EX01)
+CPH2569_15.0.0.1800(EX01)
+CPH2569_15.0.0.1901(EX01)
+CPH2569_15.0.0.1902(EX01)
+```
+
+> [!WARNING]
+> The source notes specifically advise OOS 15.0.0.1301 users to avoid older firmware when flashing or reverting. Treat firmware/slot state as a first-class prerequisite, not an afterthought.
+
+---
+
+## OOS 15.0.0.1301 — Special Warning Summary
+
+For users already on `CPH2569_15.0.0.1301`:
+
+1. Update `1301` with a future OTA while the bootloader is locked, **or** put `1301` on the other slot as described earlier.
+2. Use custom ROMs shipped **without firmware** where required.
+3. Do not flash custom ROMs or downgrades containing older firmware.
+4. Do not update OxygenOS with the bootloader unlocked.
+5. The source warns that ignoring these steps can hard-brick the device.
+
+For users who **never updated to OOS 15.0.0.1301**, the source says **not to update to 1301 solely for modding purposes** and not to revert to it from a custom ROM.
+
+---
+
+## Reverting Files / Packages
+
+The source references the following recovery/script packages:
+
+```text
+lineage recovery
+myshit_zip
+evox recovery + myshit_zip with platform tools
+```
+
+The original notes indicate that download links are maintained in their Telegram/XDA/community posts rather than embedded consistently in the notes.
+
+---
+
+## Reference Links
+
+### Drivers / Platform Tools
+
+- Universal ADB Drivers: https://adb.clockworkmod.com/
+- Google USB Drivers: https://developer.android.com/studio/run/win-usb
+- Platform-Tools: https://developer.android.com/tools/releases/platform-tools
+- ADB/Fastboot installer: https://github.com/fawazahmed0/Latest-adb-fastboot-installer-for-windows
+
+### Device
+
+- OnePlus Nord CE 3 official specs:  
+  https://www.oneplus.in/nord-ce-3-5g/specs
+
+### Community resources
+
+- Telegram Support Group:  
+  https://t.me/OnePlusNordCE35G
+- Telegram Update Channel:  
+  https://t.me/oneplusnordce3channel
+- Flashing steps for 1301/1601/1602+:  
+  https://t.me/OnePlusNordCE35G/76698
+- Reverting to OOS files:  
+  https://sourceforge.net/projects/evox-unofficial-ziti/files/Reverting%20to%20OOS/
+- XDA warning thread referenced by the source:  
+  https://xdaforums.com/t/final-warning-permanent-bootloader-lock-incoming-for-oppo-oneplus-realme-devices.4776062/
+
+### GApps
+
+The source references:
+
+- MindTheGapps A-14.0.0
+- NikGapps
+
+Use a package appropriate for the Android version and ROM build being flashed.
+
+---
+
+## Practical Flashing Checklist
+
+Before touching partitions:
+
+- [ ] Back up personal data.
+- [ ] Back up `persist.img` and `super.img` where possible.
+- [ ] Confirm exact model: `CPH2569`.
+- [ ] Record current OxygenOS version.
+- [ ] Record active slot:
 
 ```bash
 fastboot getvar current-slot
 ```
 
-### Reboot normally
-
-```bash
-fastboot reboot
-```
-
-### Reboot to recovery
-
-```bash
-fastboot reboot recovery
-```
-
-### Unlock bootloader
-
-```bash
-fastboot flashing unlock
-```
-
-### Lock bootloader
-
-```bash
-fastboot flashing lock
-```
-
-### Flash boot image
-
-```bash
-fastboot flash boot boot.img
-```
-
-### Erase user data
-
-```bash
-fastboot -w
-```
-
-> Never execute a destructive Fastboot command unless you understand exactly which partition/state it affects.
+- [ ] Install current Platform-Tools.
+- [ ] Install working USB/ADB/Fastboot drivers.
+- [ ] Confirm `adb devices`.
+- [ ] Confirm `fastboot devices`.
+- [ ] Confirm the ROM's required firmware state.
+- [ ] Confirm whether the ROM is an ADB-sideload build or Fastboot build.
+- [ ] Confirm whether recovery supports reverting to stock.
+- [ ] Keep the correct stock `boot.img`.
+- [ ] Do not downgrade with an unlocked bootloader.
+- [ ] Do not relock while rooted or while using a patched boot image.
+- [ ] For OOS 15.0.0.1301+ workflows, verify both slots use the intended firmware before proceeding.
 
 ---
 
-# ADB Commands Reference
+## Source Notes
 
-### Verify ADB connection
+This README is a **curated reorganization of the supplied notes dump**. The original material contains tutorials, warnings, community references, and shorthand such as `my_shit.zip` / `myshit_zip`; these names have been retained where they are part of the documented procedure.
 
-```bash
-adb devices
-```
+Source notes include contributions credited to Anchal Singh / `@loid_ok`, `@pjgowtham`, `@venkat3620`, `@vekye`, `@MrSnklp`, `@r0ckstar126`, and others.
 
-### Reboot normally
-
-```bash
-adb reboot
-```
-
-### Reboot to bootloader
-
-```bash
-adb reboot bootloader
-```
-
-### Reboot to recovery
-
-```bash
-adb reboot recovery
-```
-
-### Open shell
-
-```bash
-adb shell
-```
-
-### Copy file to phone
-
-```bash
-adb push file.img /sdcard/
-```
-
-### Copy file from phone
-
-```bash
-adb pull /sdcard/file.img
-```
-
-### Start sideload
-
-```bash
-adb sideload rom.zip
-```
-
----
-
-# Troubleshooting
-
-## `adb devices` shows nothing
-
-Check:
-
-* USB cable
-* USB port
-* USB debugging
-* Windows driver installation
-* Authorization popup on the phone
-* Device Manager
-* ADB server
-
-Try:
-
-```bash
-adb kill-server
-adb start-server
-adb devices
-```
-
----
-
-## `fastboot devices` shows nothing
-
-Check that the phone is actually in Fastboot mode.
-
-Try:
-
-```bash
-fastboot devices
-```
-
-If nothing appears, verify:
-
-* USB cable
-* Fastboot driver
-* Windows Device Manager
-* Platform-Tools version
-
-Always prefer the latest Platform-Tools release from Google.
-
----
-
-## ROM installation stops around 47%
-
-Some Ziti recovery/ROM workflows report the installation reaching around 47% and appearing to pause while the recovery waits for another action.
-
-Do not immediately assume the flash failed.
-
-Read the recovery message carefully and follow the ROM maintainer's instructions regarding additional packages and rebooting recovery.
-
----
-
-## `INSTALL DEVICE OPEN ERROR`
-
-For some older Ziti sideload workflows, the community workaround was:
-
-1. Format data.
-2. Reboot recovery.
-3. Attempt the ROM installation again.
-
-This should not be treated as a universal solution for every ROM or recovery.
-
-Always check the ROM-specific documentation first.
-
----
-
-# Before You Start: Checklist
-
-```text
-[ ] Device is OnePlus Nord CE 3 5G / CPH2569 / ziti
-[ ] Battery sufficiently charged
-[ ] Important files backed up
-[ ] Correct ROM downloaded
-[ ] Correct recovery downloaded
-[ ] Correct firmware verified
-[ ] Latest Platform-Tools installed
-[ ] ADB works
-[ ] Fastboot works
-[ ] Bootloader status confirmed
-[ ] Correct slot/firmware state verified
-[ ] Stock recovery/images backed up where appropriate
-[ ] I have read the warnings
-```
-
----
-
-# Community Resources
-
-### Telegram Support Group
-
-https://t.me/OnePlusNordCE35G
-
-### Telegram Update Channel
-
-https://t.me/oneplusnordce3channel
-
-### XDA
-
-Use the relevant OnePlus Nord CE 3 / Oplus bootloader and firmware threads.
-
-### SourceForge
-
-Community ROM maintainers may publish Ziti builds, recoveries and reverting files through SourceForge.
-
----
-
-# Credits
-
-This documentation consolidates procedures and community knowledge contributed by Ziti users, maintainers and ROM developers.
-
-Original material referenced in the source notes includes contributions attributed to:
-
-* Anchal Singh / `@loid_ok`
-* `@pjgowtham`
-* `@venkat3620`
-* Ziti ROM developers and testers
-* OnePlus / OxygenOS community members
-* Realme / OPlus community resources used for recovery/reverting procedures
-
-Individual guides should retain their original credits when copied or adapted.
-
----
-
-# Important Notice
-
-This repository is a **community documentation project**, not an official OnePlus resource.
-
-Information can become outdated as OxygenOS, firmware, recoveries and custom ROM installation methods change.
-
-Before flashing:
-
-**Check the ROM maintainer's current instructions.**
-
-A guide that worked on an older OxygenOS build may be unsafe on a newer one.
+> [!NOTE]
+> Community instructions can become outdated as firmware changes. Before flashing, check the current ROM maintainer post and the current firmware requirements for your exact build.
