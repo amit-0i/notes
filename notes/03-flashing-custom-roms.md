@@ -5,13 +5,14 @@
 >
 > You are responsible for anything you do to your device. This documentation is community-maintained and is provided without warranty.
 
+>[!CAUTION]
+> Your data will be lost during the process, please backup your data.
+
 ## Prerequisites
 - Make sure you have read the warning: [here](./00-warning.md)
 - Install the required adb and fastboot drivers: [guide](./01-resources.md#latest-adbfastboot-installer-github--httpsgithubcomfawazahmed0latest-adb-fastboot-installer-for-windows)
 - Download the required files:- [platform tools](./01-resources.md#platform-tools--httpsdeveloperandroidcomtoolsreleasesplatform-tools), recovery which the ROM maintainer recommends, ROM zip
 
->[!CAUTION]
-> Your data will be lost during the process, please backup your data.
 >[!TIP]
 > Before installing custom ROM, backup your super.img and persist.img. More on that [here](./02-backup-super-persist.md)
 
@@ -61,3 +62,23 @@ to lock bootloader, run:
 ```shell
 fastboot flashing lock
 ```
+
+### 2. Flashing recovery
+Each recovery zip will have
+- boot.img, dtbo.img, super_empty.img, vbmeta.img, vendor_boot.img
+- flash.sh, flash.bat
+
+first, reboot to bootloader, run:
+```shell
+adb reboot bootloader
+```
+
+second, Unzip the recovery zip and run:
+```shell
+./flash.bat // or flash.sh if your are on linux
+```
+this script flashes the above mentioned images with fastboot command and then reboots your phone into the recovery
+
+### 3. Format Data
+while in recovery, press `Factory reset` > then `Format data/Factory reset`
+
