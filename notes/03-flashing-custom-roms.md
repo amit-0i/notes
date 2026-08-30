@@ -12,6 +12,10 @@
 
 >[!CAUTION]
 > Your data will be lost during the process, please backup your data.
-
 >[!TIP]
-> Before installing custom ROM, backup your super.img and persist.img. More on that [here]()
+> Before installing custom ROM, backup your super.img and persist.img. More on that [here](./02-backup-super-persist.md)
+
+## Steps
+### 1. Unlock bootloader
+1. Turn on Developer option
+Go to Settings
