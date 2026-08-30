@@ -18,7 +18,9 @@
 ## Steps
 ### 1. Unlock bootloader
 >[!CAUTION]
-> Unlocking bootloader is only possible on **OxygenOS 14** or above
+> - Unlocking bootloader is only possible on **OxygenOS 14** or above
+> - DO NOT try to downgrade to **OxygenOS 13** with an unlocked bootloader
+> - This process will erase your data, backup before proceeding
 #### 1. Turn on Developer option
 
 Go to Settings > About phone > Version > Tap version 7-8 times
