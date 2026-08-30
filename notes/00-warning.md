@@ -10,4 +10,4 @@ To check your current OxygenOS version follow the below steps:-
 
 ![About Phone Version](../src/about-phone-version.png)
 
-4. Here the current version is OOS15.0.0.1604 i.e. 1604
+4. Here the current version is **OOS15.0.0.1604** i.e. 1604
