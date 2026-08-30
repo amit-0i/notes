@@ -10,11 +10,11 @@
 
 ## Prerequisites
 - Make sure you have read the warning: [here](./00-warning.md)
-- Install the required adb and fastboot drivers: [guide](./01-resources.md#latest-adbfastboot-installer-github--httpsgithubcomfawazahmed0latest-adb-fastboot-installer-for-windows)
-- Download the required files:- [platform tools](./01-resources.md#platform-tools--httpsdeveloperandroidcomtoolsreleasesplatform-tools), recovery which the ROM maintainer recommends, ROM zip
+- Install the required adb and fastboot drivers: [guide](./02-resources.md#latest-adbfastboot-installer-github--httpsgithubcomfawazahmed0latest-adb-fastboot-installer-for-windows)
+- Download the required files:- [platform tools](./02-resources.md#platform-tools--httpsdeveloperandroidcomtoolsreleasesplatform-tools), recovery which the ROM maintainer recommends, ROM zip
 
 >[!TIP]
-> Before installing custom ROM, backup your super.img and persist.img. More on that [here](./02-backup-super-persist.md)
+> Before installing custom ROM, backup your super.img and persist.img. More on that [here](./03-backup-super-persist.md)
 
 ## Steps
 ### 1. Unlock bootloader
@@ -51,7 +51,7 @@ to check if you have proper connection between your phone and pc/laptop run:
 ```shell
 fastboot devices
 ```
-if nothing shows up, install proper drivers from [here](./01-resources.md)
+if nothing shows up, install proper drivers from [here](./02-resources.md)
 
 to unlock bootloader, run:
 ```shell
