@@ -42,3 +42,20 @@ again type the above command and this type a serial device number will appear, t
 adb reboot bootloader
 ```
 You can also enter Bootloader/Fastboot Mode by pressing and holding `volume -` & `power button` while restarting the device.
+
+#### 5. Unlock / Lock bootloader
+to check if you have proper connection between your phone and pc/laptop run:
+```shell
+fastboot devices
+```
+if nothing shows up, install proper drivers from [here](./01-resources.md)
+
+to unlock bootloader, run:
+```shell
+fastboot flashing unlock
+```
+
+to lock bootloader, run:
+```shell
+fastboot flashing lock
+```
